@@ -68,16 +68,21 @@ Expected<CompiledModelNext> CompiledModelNext::Create(
   if (auto status = env_holder.runtime->CreateModelFromFile(
           model_filename.c_str(), &litert_model);
       status != kLiteRtStatusOk) {
+    // Cleanup resources before returning error
     return Unexpected(status, "Failed to load model from file");
   }
   LiteRtCompiledModel compiled_model;
+  // Ensure proper cleanup of resources on error
+  absl::Cleanup model_cleanup = [&env_holder, litert_model] {
+    env_holder.runtime->DestroyModel(litert_model);
+  };
   if (auto status = env_holder.runtime->CreateCompiledModel(
           env_holder.handle, litert_model, compilation_options.Get(),
           &compiled_model);
       status != kLiteRtStatusOk) {
-    env_holder.runtime->DestroyModel(litert_model);
     return Unexpected(status, "Failed to compile model");
   }
+  std::move(model_cleanup).Cancel();
   return CompiledModelNext(env_holder, litert_model,
                            /*model_owned=*/OwnHandle::kYes, compiled_model,
                            OwnHandle::kYes);
