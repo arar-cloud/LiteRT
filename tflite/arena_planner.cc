@@ -279,6 +279,8 @@ TfLiteStatus ArenaPlanner::PlanAllocations() {
     for (int j = 0; j < node_inputs->size; ++j) {
       int tensor_index = node_inputs->data[j];
       if (tensor_index != kTfLiteOptionalTensor) {
+        // Cache FindSharedTensor result to avoid redundant map lookups
+        tensor_index = FindSharedTensor(tensor_index);
         ++refcounts_[tensor_index];
       }
     }
@@ -286,7 +288,8 @@ TfLiteStatus ArenaPlanner::PlanAllocations() {
 
   IdentifyInPlaceTensors();
   // Use the new reference counts to determine when tensors memory can safely be
-  // reused.
+  // reused. Pre-allocate vectors to avoid repeated reallocations during loop.
+  refcounts.reserve(num_tensors);
   for (size_t i = 0; i < num_execution_nodes; ++i) {
     const TfLiteNode& node = graph_info_->node(i);
     TfLiteIntArray* node_inputs = node.inputs;
