@@ -273,15 +273,20 @@ TfLiteStatus ArenaPlanner::PlanAllocations() {
   std::vector<int> refcounts = refcounts_;
   // Count references to node input tensors.
   const int num_execution_nodes = graph_info_->num_execution_nodes();
+  // Build lookup cache to avoid repeated FindSharedTensor calls
+  std::vector<int> tensor_id_cache(num_tensors);
+  for (size_t t = 0; t < num_tensors; ++t) {
+    tensor_id_cache[t] = FindSharedTensor(static_cast<int>(t));
+  }
   for (size_t i = 0; i < num_execution_nodes; ++i) {
     const TfLiteNode& node = graph_info_->node(i);
     TfLiteIntArray* node_inputs = node.inputs;
     for (int j = 0; j < node_inputs->size; ++j) {
       int tensor_index = node_inputs->data[j];
       if (tensor_index != kTfLiteOptionalTensor) {
-        // Cache FindSharedTensor result to avoid redundant map lookups
-        tensor_index = FindSharedTensor(tensor_index);
-        ++refcounts_[tensor_index];
+        // Use pre-computed cache instead of repeated map lookups
+        int resolved_index = tensor_id_cache[tensor_index];
+        ++refcounts_[resolved_index];
       }
     }
   }
@@ -296,9 +301,9 @@ TfLiteStatus ArenaPlanner::PlanAllocations() {
     for (int j = 0; j < node_inputs->size; ++j) {
       int tensor_index = node_inputs->data[j];
       if (tensor_index != kTfLiteOptionalTensor) {
-        // Correctly count references for shared buffers.
-        tensor_index = FindSharedTensor(tensor_index);
-        ++refcounts[tensor_index];
+        // Use pre-computed cache for shared buffer references
+        int resolved_index = tensor_id_cache[tensor_index];
+        ++refcounts[resolved_index];
       }
     }
   }
