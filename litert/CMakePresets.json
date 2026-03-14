@@ -9,7 +9,7 @@
       "binaryDir": "${sourceDir}/cmake_build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_FLAGS": "-fpermissive"
+        "CMAKE_CXX_FLAGS": "-fpermissive -march=armv8-a -mtune=generic -flto=auto"
       }
     },
     {
