@@ -15,6 +15,20 @@
 # ==============================================================================
 set -ex
 
+# Declare arrays for Bazel flags to prevent command injection
+declare -a BAZEL_FLAGS_ARRAY
+declare -a CUSTOM_FLAGS_ARRAY
+
+# Parse and validate BAZEL_CONFIG_FLAGS if provided
+if [[ -n "${BAZEL_CONFIG_FLAGS}" ]]; then
+  mapfile -t BAZEL_FLAGS_ARRAY < <(echo "${BAZEL_CONFIG_FLAGS}" | tr ' ' '\n')
+fi
+
+# Parse and validate CUSTOM_BAZEL_FLAGS if provided
+if [[ -n "${CUSTOM_BAZEL_FLAGS}" ]]; then
+  mapfile -t CUSTOM_FLAGS_ARRAY < <(echo "${CUSTOM_BAZEL_FLAGS}" | tr ' ' '\n')
+fi
+
 # Valid values for PLATFORM_NAME are "ubuntu", "android", "ios".
 PLATFORM_NAME="${PLATFORM_NAME:-ubuntu}"
 EXPERIMENTAL_TARGETS_ONLY="${EXPERIMENTAL_TARGETS_ONLY:-false}"
