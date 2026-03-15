@@ -4,11 +4,12 @@
     {
       "name": "default",
       "displayName": "Default (host) Release",
+      "description": "Cross-compile for Android arm64-v8a. Requires ANDROID_NDK_HOME environment variable to be set.",
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/cmake_build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_FLAGS": "-fpermissive"
+        "CMAKE_CXX_FLAGS": "-fpermissive -march=armv8-a -mtune=generic -flto=auto"
       }
     },
     {

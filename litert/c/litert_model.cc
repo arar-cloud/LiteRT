@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "litert/c/litert_model.h"
+#include "litert/c/internal/litert_c_api_validation.h"
 
 #include <cstddef>
 #include <cstdint>

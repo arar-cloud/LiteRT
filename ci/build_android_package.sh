@@ -169,8 +169,9 @@ prepare_pom_and_artifact() {
   # https://central.sonatype.org/publish/requirements/
   SOURCES_JAR="${DST_DIR}/${PACKAGE}-${VERSION}-sources.jar"
   JAVADOC_JAR="${DST_DIR}/${PACKAGE}-${VERSION}-javadoc.jar"
-  make_placeholder_jar "${SOURCES_JAR}"
-  make_placeholder_jar "${JAVADOC_JAR}"
+  make_placeholder_jar "${SOURCES_JAR}" &
+  make_placeholder_jar "${JAVADOC_JAR}" &
+  wait
 }
 
 # To configure Android via TF's 'configure' script.

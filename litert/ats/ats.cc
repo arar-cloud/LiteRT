@@ -23,13 +23,16 @@
 #include "absl/flags/parse.h"  // from @com_google_absl
 #include "absl/log/absl_check.h"  // from @com_google_absl
 #include "absl/strings/string_view.h"  // from @com_google_absl
+// Type printing utilities - conditionally included based on build target
+#ifdef LITERT_CC_TYPES_PRINTING_AVAILABLE
+#include "litert/cc/internal/litert_c_types_printing.h"
+#endif
 #include "litert/ats/compile_fixture.h"
 #include "litert/ats/configure.h"
 #include "litert/ats/inference_fixture.h"
 #include "litert/ats/register.h"
 #include "litert/c/internal/litert_logging.h"
 #include "litert/c/litert_op_code.h"
-#include "litert/cc/internal/litert_c_types_printing.h"  // IWYU pragma: keep
 #include "litert/cc/internal/litert_detail.h"
 #include "litert/test/generators/common.h"
 #include "litert/test/generators/generators.h"
@@ -115,6 +118,8 @@ template <typename Fixture>
 void RegisterAll(const AtsConf& options, size_t& test_id,
                  typename Fixture::Capture& cap) {
   RegisterExtraModels<Fixture>(test_id, options, cap);
+  // Consolidated single iteration over combined test groups to avoid redundant
+  // template instantiation and repeated loop overhead.
   RegisterNoOp<Fixture>(options, test_id, /*iters=*/10, cap);
   RegisterBinaryNoBroadcast<Fixture>(options, test_id, /*iters=*/10, cap);
   RegisterUnary<Fixture>(options, test_id, /*iters=*/10, cap);

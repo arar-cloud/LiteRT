@@ -108,7 +108,9 @@ LITERT_EXCLUDED_TARGETS=(
 
 
 if [ "$LITERT_TARGETS_ONLY" == "true" ]; then
-    bazel test "${BUILD_FLAGS[@]}" -- //litert/... "${LITERT_EXCLUDED_TARGETS[@]}"
+    # Explicit job parallelism: use all available CPU cores
+    bazel test --jobs=$(nproc) "${BUILD_FLAGS[@]}" -- //litert/... "${LITERT_EXCLUDED_TARGETS[@]}"
 else
-    bazel test "${BUILD_FLAGS[@]}" -- //tflite/... "${EXCLUDED_TARGETS[@]}"
+    # Explicit job parallelism: use all available CPU cores
+    bazel test --jobs=$(nproc) "${BUILD_FLAGS[@]}" -- //tflite/... "${EXCLUDED_TARGETS[@]}"
 fi

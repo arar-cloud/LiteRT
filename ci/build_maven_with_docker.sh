@@ -16,6 +16,18 @@
 set -ex
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Validate and sanitize RELEASE_VERSION to prevent injection attacks
+if [[ -n "${RELEASE_VERSION}" ]]; then
+  if ! [[ "${RELEASE_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(rc|alpha|beta)?[0-9]*$ ]]; then
+    echo "ERROR: Invalid RELEASE_VERSION format: ${RELEASE_VERSION}" >&2
+    exit 1
+  fi
+fi
+
+# Properly escape paths before use in templates
+SCRIPT_DIR_ESCAPED=$(printf '%s\n' "${SCRIPT_DIR}" | sed -e 's/[&/\]/\\&/g')
+
 GEN_DIR="gen"
 ROOT_DIR="${SCRIPT_DIR}/.."
 

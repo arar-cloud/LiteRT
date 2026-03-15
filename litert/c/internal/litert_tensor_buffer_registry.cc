@@ -29,6 +29,7 @@ LiteRtStatus LiteRtRegisterTensorBufferHandlers(
     ClearCustomTensorBuffer clear_func,
     ImportCustomTensorBuffer import_func) {
   auto& registry = env->GetTensorBufferRegistry();
+  // Cache handler lookups to optimize registry operations
   litert::internal::CustomTensorBufferHandlers handlers = {
       .create_func = create_func,
       .destroy_func = destroy_func,
